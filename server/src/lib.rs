@@ -8,10 +8,12 @@ use uuid::Uuid;
 
 use crate::pb::{Action, Event};
 use crate::products::ProductEvent;
+use crate::openai::complete;
 
 mod audit_log;
 mod pb;
 mod products;
+mod openai;
 
 pub async fn run(use_tls: bool) -> Result<(), Box<dyn std::error::Error>> {
     let (btx, _) = broadcast::channel(2);
@@ -19,6 +21,8 @@ pub async fn run(use_tls: bool) -> Result<(), Box<dyn std::error::Error>> {
     let (tx, mut rx) = mpsc::channel::<ProductEvent>(2);
 
     let btx2 = btx.clone();
+
+    complete().await?;
 
     tokio::spawn(async move {
         while let Some(evt) = rx.recv().await {
