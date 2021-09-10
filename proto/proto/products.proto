@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package products;
+
+import "google/protobuf/timestamp.proto";
+
+service ProductService {
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse) {}
+  rpc CreateProduct (CreateProductRequest) returns (Empty) {}
+  rpc DeleteProduct (DeleteProductRequest) returns (Empty) {}
+}
+
+message Empty {}
+
+message Product {
+  // output only
+  string id = 1;
+
+  string name = 2;
+
+  // output only
+  google.protobuf.Timestamp create_time = 3;
+}
+
+message ListProductsRequest {}
+
+message ListProductsResponse {
+  repeated Product products = 1;
+}
+
+message CreateProductRequest {
+  Product product = 1;
+}
+
+message DeleteProductRequest {
+  string id = 1;
+}

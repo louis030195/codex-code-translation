@@ -1,0 +1,18 @@
+[package]
+name = "server"
+version = "0.1.0"
+authors = ["Juan Alvarez <alce@me.com>"]
+edition = "2018"
+
+[dependencies]
+tonic = { version = "0.5.0", features = ["tls"] }
+tonic-web = "0.1.0"
+tokio = { version = "1.8.1", features = ["full"] }
+prost = "0.8.0"
+prost-types = "0.8.0"
+futures-util = "0.3.15"
+tracing = "0.1.26"
+tracing-subscriber = "0.2.19"
+uuid = { version = "0.8", features = ["v4"] }
+structopt = "0.3.22"
+tokio-stream = { version = "0.1.7", features = ["sync"] }

@@ -1,0 +1,37 @@
+.button-small {
+    font-size: .8rem;
+    height: 2.8rem;
+    line-height: 2.8rem;
+    padding: 0 1.5rem;
+}
+
+span.error {
+    color: red;
+}
+
+input.error {
+    border-color: red;
+}
+
+header {
+    border-bottom: solid 1px #ddd;
+    height: 35px;
+    margin-bottom: 30px;
+}
+
+.event:first-child {
+    border-top: 1px solid #ddd;
+}
+
+.event {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.event p {
+    margin: 0
+}
+
+.mute {
+    font-size: 0.7em;
+}

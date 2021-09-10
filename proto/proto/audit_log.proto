@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package products;
+
+import "google/protobuf/timestamp.proto";
+import "products.proto";
+
+service AuditLogService {
+  rpc Subscribe (SubscribeRequest) returns (stream Event) {}
+}
+
+enum Action {
+  UNKNOWN = 0;
+  CREATED = 1;
+  DELETED = 2;
+}
+
+message Event {
+  string id = 1;
+
+  Action action = 2;
+
+  string product_id = 3;
+
+  Product product = 4;
+
+  string user = 5;
+
+  google.protobuf.Timestamp create_time = 6;
+}
+
+message SubscribeRequest {}
+
