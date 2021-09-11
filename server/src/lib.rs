@@ -1,78 +1,43 @@
-use std::time::SystemTime;
+use tokio::sync::{mpsc};
+use tonic::transport::{Server};
+use tracing::{info};
+use std::env;
 
-use prost_types::Timestamp;
-use tokio::sync::{broadcast, mpsc};
-use tonic::transport::{Identity, Server, ServerTlsConfig};
-use tracing::{error, info};
-use uuid::Uuid;
+use crate::translations::TranslationEvent;
 
-use crate::pb::{Action, Event};
-use crate::products::ProductEvent;
-use crate::openai::complete;
-
-mod audit_log;
+mod translations;
 mod pb;
-mod products;
 mod openai;
 
-pub async fn run(use_tls: bool) -> Result<(), Box<dyn std::error::Error>> {
-    let (btx, _) = broadcast::channel(2);
-
-    let (tx, mut rx) = mpsc::channel::<ProductEvent>(2);
-
-    let btx2 = btx.clone();
-
-    complete().await?;
+pub async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    env::var("OPENAI_KEY").expect("OPENAI_KEY must be set");
+    env::var("OPENAI_ORG").expect("OPENAI_ORG must be set");
+    let (tx, mut rx) = mpsc::channel::<TranslationEvent>(2);
 
     tokio::spawn(async move {
         while let Some(evt) = rx.recv().await {
-            let mut event = Event {
-                id: Uuid::new_v4().to_string(),
-                create_time: Some(Timestamp::from(SystemTime::now())),
-                ..Default::default()
-            };
-
             match evt {
-                ProductEvent::Created(product, user) => {
-                    event.action = Action::Created as i32;
-                    event.product = Some(product);
-                    event.user = user;
+                TranslationEvent::Translated(translation) => {
+                    Some(translation);
                 }
-
-                ProductEvent::Deleted(id, user) => {
-                    event.action = Action::Deleted as i32;
-                    event.product_id = id.to_string();
-                    event.user = user;
-                }
-            }
-
-            if let Err(e) = btx2.send(event) {
-                error!("failed to broadcast event: {:?}", e)
             }
         }
     });
 
-    let addr = ([127, 0, 0, 1], 9999).into();
+    // TODO: should be configurable?
+    let addr = ([0, 0, 0, 0], 9999).into();
 
-    let config = tonic_web::config().allow_origins(vec!["http://localhost:3000"]);
-    let audit_log = config.enable(audit_log::service(btx));
-    let products = config.enable(products::service(tx));
+    // TODO: should be configurable? Should let in production?
+    let config = tonic_web::config().allow_all_origins();
+    let translations = config.enable(translations::service(tx));
 
-    let mut builder = Server::builder();
+    let mut builder = Server::builder()
+        .concurrency_limit_per_connection(32);
 
-    if use_tls {
-        let cert = tokio::fs::read("data/localhost.pem").await?;
-        let key = tokio::fs::read("data/localhost-key.pem").await?;
-        let identity = Identity::from_pem(cert, key);
-        builder = builder.tls_config(ServerTlsConfig::new().identity(identity))?;
-    }
-
-    info!(tls = use_tls, "listening on {}", addr);
+    info!("listening on {}", addr);
 
     builder
-        .accept_http1(!use_tls)
-        .add_service(audit_log)
-        .add_service(products)
+        .add_service(translations)
         .serve(addr)
         .await
         .map_err(Into::into)

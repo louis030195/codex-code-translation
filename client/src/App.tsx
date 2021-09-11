@@ -1,112 +1,153 @@
-import { Error, Metadata, StatusCode } from "grpc-web";
-import React, { useCallback, useEffect, useState } from "react";
-import { AuditLog } from "./AuditLog";
-import { Auth, loadCurrentUser } from "./Auth";
+import React, { useEffect, useState } from "react";
+import CodeEditor, { CodeEditorRef } from "./CodeEditor";
+import { CodeTranslationServiceClient } from "./pb/TranslationsServiceClientPb";
 import {
-  CreateProductRequest,
-  DeleteProductRequest,
-  ListProductsRequest,
-  Product,
-} from "./pb/products_pb";
-import { ProductServiceClient } from "./pb/ProductsServiceClientPb";
-import { ProductList } from "./ProductList";
+  TranslateCodeRequest,
+  Translation,
+} from "./pb/translations_pb";
 
-const scheme = process.env.REACT_APP_BACKEND_SCHEME || 'http';
-const client = new ProductServiceClient(`${scheme}://localhost:9999`);
+const client = new CodeTranslationServiceClient(
+  process.env.REACT_APP_BACKEND_URL || "http://localhost:9999",
+);
+// https://statisticstimes.com/tech/top-computer-languages.php
+// Most popular programming languages
+const languages = [
+  "Python",
+  "Java",
+  "C",
+  "C++",
+  "C#",
+  "JavaScript",
+  "TypeScript",
+  "Go",
+  "Rust",
+  "Swift",
+  "Kotlin",
+  "PHP",
+  "Ruby",
+  "R",
+  "Perl",
+  "Scala",
+  "Haskell",
+]
+
+const defaultTranslation = new Translation();
+defaultTranslation.setInputCode("def foo():");
+defaultTranslation.setOutputCode("public void foo() {");
+defaultTranslation.setInputLanguage(languages[0]);
+defaultTranslation.setOutputLanguage(languages[1]);
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [productError, setProductError] = useState("");
-  const [authError, setAuthError] = useState("");
-
+  const [translation, setTranslation] = useState<Translation>(defaultTranslation);
+  const codeEditorRef = React.useRef<CodeEditorRef>(null);
   useEffect(() => {
-    (async () => {
-      let res = await client.listProducts(new ListProductsRequest(), {});
-      setProducts(res.getProductsList());
-    })();
+    codeEditorRef.current?.setText(translation.getInputCode());
   }, []);
 
-  const parseError = useCallback((e: Error) => {
-    switch (e.code) {
-      case StatusCode.UNAUTHENTICATED:
-        setAuthError(e.message);
-        break;
-      case StatusCode.INVALID_ARGUMENT:
-        setProductError(e.message);
-        break;
-      default:
-        console.log("unknown error");
-    }
-  }, []);
+  const createTranslation = async (e: any): Promise<Translation | undefined> => {
+    e.preventDefault();
+    setTranslation(translation.cloneMessage().setOutputCode("..."));
+    const req = new TranslateCodeRequest();
+    req.setTranslation(translation);
 
-  const makeMetadata = useCallback((): Metadata => {
-    // TODO: maybe move to Context or set in callback
-    let currentUser = loadCurrentUser();
-
-    return currentUser ? { "custom-header-1": currentUser } : {};
-  }, []);
-
-  const createProduct = async (name: string) => {
-    setProductError("");
-
-    const product = new Product();
-    product.setName(name);
-
-    const req = new CreateProductRequest();
-    req.setProduct(product);
-
-    try {
-      await client.createProduct(req, makeMetadata());
-    } catch (e) {
-      parseError(e);
-    }
-  };
-
-  const deleteProduct = async (id: string) => {
-    let req = new DeleteProductRequest();
-    req.setId(id);
-
-    try {
-      await client.deleteProduct(req, makeMetadata());
-    } catch (e) {
-      parseError(e);
-    }
-  };
-
-  const addProduct = (product: Product) => {
-    setProducts((prev) => [product, ...prev]);
-  };
-
-  const removeProduct = (id: string) => {
-    setProducts((prev) => prev.filter((p) => p.getId() !== id));
+    const r = await client.translateCode(req, null);
+    if (!r.hasTranslation()) throw Error("no translation");
+    return r.getTranslation()!;
   };
 
   return (
-    <div className="container">
-      <Auth authError={authError} clearError={() => setAuthError("")} />
-
-      <div className="row">
-        <div className="column column-60">
-          <h3>Inventory</h3>
-          <ProductList
-            error={productError}
-            products={products}
-            onCreateProduct={createProduct}
-            onDeleteProduct={deleteProduct}
-          />
-        </div>
-
+    <div
+      className="codexrs-page"
+    >
+      <form
+        style={{ 
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          alignContent: "center",
+          padding: "10px",
+        }}
+      >
         <div
-          className="column column-30 column-offset-10"
-          style={{ borderLeft: "solid 1px #ddd", paddingLeft: "20px" }}
+         style={{ 
+            display: "flex",
+            justifyContent: "center",
+            height: "70%",
+            width: "90%",
+            alignItems: "center",
+            alignContent: "center",
+            padding: "10px",
+          }}
         >
-          <h4>Activity</h4>
-          <AuditLog
-            onProductCreated={addProduct}
-            onProductDeleted={removeProduct}
-          />
+          <div
+            className="code-block"
+          >
+            <select
+              tabIndex={-1}
+              onChange={(e) => setTranslation(
+                translation.cloneMessage().setInputLanguage(e.target.value)
+              )}
+              value={translation.getInputLanguage()}
+              className="noselect language-select"
+            >
+              {languages.map((language, index) =>
+                <option key={index} value={language}>{language}</option>
+              )}
+            </select>
+            <CodeEditor 
+              ref={codeEditorRef}
+              onChange={(e) => setTranslation(
+                translation.cloneMessage().setInputCode(e.target.value)
+              )}
+              className="code-text"
+              cols={60} rows={40}
+              name="input"/>
+          </div>
+          <div
+            className="code-block"
+          >
+            <select
+              tabIndex={-1}
+              onChange={(e) => setTranslation(
+                translation.cloneMessage().setOutputLanguage(e.target.value)
+              )}
+              value={translation.getOutputLanguage()}
+              className="noselect language-select"
+            >
+              {languages.map((language, index) =>
+                <option key={index} value={language}>{language}</option>
+              )}
+            </select>
+            <textarea 
+              tabIndex={-1}
+              readOnly
+              value={translation.getOutputCode()}
+              className="code-text"
+              cols={60} rows={40}
+              name="output"/>
+          </div>
         </div>
-      </div>
+        <button 
+          tabIndex={-1}
+          className="code-button"
+          onClick={(e) => {
+            createTranslation(e).then((res) => {
+              setTranslation(translation.cloneMessage().setOutputCode(res!.getOutputCode()));
+            });
+          }}>Translate
+        </button>
+      </form>
+      <a 
+        style={{
+          position: "absolute",
+          bottom: "10px",
+          right: "10px",
+          color: "white",
+          fontStyle: "italic",
+        }}
+        target="_blank" rel="noopener noreferrer" 
+        href="https://github.com/louis030195/codex-code-translation">made with ❤️ by louis030195</a>
     </div>
   );
 }

@@ -1,1 +1,1 @@
-include!("products.rs");
+include!("translations.rs");

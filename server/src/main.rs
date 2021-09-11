@@ -1,3 +1,4 @@
+use codex_code_translation_server::run;
 use structopt::StructOpt;
 use tracing::error;
 use tracing_subscriber::EnvFilter;
@@ -16,7 +17,7 @@ async fn main() {
 
     let matches = Opts::from_args();
 
-    if let Err(e) = server::run(matches.use_tls).await {
+    if let Err(e) = run(matches.use_tls).await {
         error!("{:?}", e)
     }
 }

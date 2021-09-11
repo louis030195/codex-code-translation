@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package translations;
+
+import "google/protobuf/timestamp.proto";
+
+service CodeTranslationService {
+  rpc TranslateCode (TranslateCodeRequest) returns (TranslateCodeResponse) {}
+}
+
+message TranslateCodeRequest {
+  Translation translation = 1;
+}
+
+message TranslateCodeResponse {
+  Translation translation = 1;
+}
+
+message Translation {
+  string id = 1;
+  google.protobuf.Timestamp created_at = 2;
+  string input_code = 3;
+  string output_code = 4;
+  string input_language = 5;
+  string output_language = 6;
+}
+message Empty {}

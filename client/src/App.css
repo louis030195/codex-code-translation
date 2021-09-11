@@ -1,37 +1,99 @@
-.button-small {
-    font-size: .8rem;
-    height: 2.8rem;
-    line-height: 2.8rem;
-    padding: 0 1.5rem;
+/* Some crazy css stuff copy pasted from the internet */
+
+html, body, #root, .codexrs-page {
+    margin: 0;
+    height: 100%;
+    width: 100%;
 }
 
-span.error {
-    color: red;
+.codexrs-page {
+    background: #002451;
 }
 
-input.error {
-    border-color: red;
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+  }
+
+.code-block {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 10px;
+    width: 50%;
+    height: 50%;
+
 }
 
-header {
-    border-bottom: solid 1px #ddd;
-    height: 35px;
-    margin-bottom: 30px;
+.code-text {
+    margin: 10px;
+    border: 1px solid #404f7d;
+    padding: 10px;
+    border-radius: 10px;
+    background: #003f8e;
+    color: #ffffff;
+    /* white-space: normal; */
+    text-align: justify;
+    text-align-last: left;
+    -moz-text-align-last: left; /* Firefox 12+ */
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-.event:first-child {
-    border-top: 1px solid #ddd;
+.code-text:focus {
+    outline: none !important;
+    border:1px solid #d4afaf44;
+  }
+
+.code-button {
+    width: 200px;
+    border: 1px solid #404f7d;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    background: #003f8e;   
+    color: #ffffff;
+    padding: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    outline-color: rgba(255, 255, 255, .5);
+    outline-offset: 0px;
+    text-shadow: none;
+    transition: all 1250ms cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.event {
-    border-bottom: 1px solid #ddd;
-    padding: 15px 0;
+.code-button:after, .code-button:before {
+    border-radius: 3px;
 }
 
-.event p {
-    margin: 0
+.code-button:active {
+    transform: translateY(3px);
 }
 
-.mute {
-    font-size: 0.7em;
+.code-button:hover {
+    background: #001c40;
+
+    border: 1px solid;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, .5), 0 0 20px rgba(255, 255, 255, .2);
+    outline-color: rgba(255, 255, 255, 0);
+    outline-offset: 15px;
+    text-shadow: 1px 1px 2px #427388; 
 }
+
+.language-select {
+    width: 50%;
+    margin: auto;
+    vertical-align: center;
+    border: 1px solid #404f7d;
+    border-radius: 10px;
+    background: #003f8e;
+    color: #ffffff;
+    padding: 10px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    
+}
+

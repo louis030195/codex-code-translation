@@ -1,8 +1,12 @@
 [package]
-name = "server"
-version = "0.1.0"
-authors = ["Juan Alvarez <alce@me.com>"]
+name = "codex-code-translation-server"
+version = "0.1.1"
+authors = ["Louis Beaumont <louis.beaumont@gmail.com>"]
 edition = "2018"
+
+[[bin]]
+name = "codex-code-translation"
+path = "src/main.rs"
 
 [dependencies]
 tonic = { version = "0.5.0", features = ["tls"] }
@@ -19,3 +23,4 @@ tokio-stream = { version = "0.1.7", features = ["sync"] }
 # Client HTTP
 reqwest = { version = "0.11", features = ["json"] }
 serde_json = "1.0"
+serde = { version = "1.0.130", features = ["derive"] }
