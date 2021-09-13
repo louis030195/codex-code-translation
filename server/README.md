@@ -32,6 +32,7 @@ gcloud run deploy codex-code-translation \
 --port=9999 \
 --set-env-vars=OPENAI_KEY="MY PRECIOUS KEY" \
 --set-env-vars=OPENAI_ORG="MY OPENAI ORG" \
+--max-instances 1
 
 # Get URL
 ENDPOINT=$(\

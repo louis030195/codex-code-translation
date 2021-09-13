@@ -41,9 +41,9 @@ jobs:
           push: true
           tags: |
             louis030195/codex-code-translation-server:latest
-            louis030195/codex-code-translation-server:1.0.2
+            louis030195/codex-code-translation-server:1.0.3
             ghcr.io/louis030195/codex-code-translation-server:latest
-            ghcr.io/louis030195/codex-code-translation-server:1.0.2
+            ghcr.io/louis030195/codex-code-translation-server:1.0.3
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -54,6 +54,6 @@ jobs:
           push: true
           tags: |
             louis030195/codex-code-translation-client:latest
-            louis030195/codex-code-translation-client:1.0.2
+            louis030195/codex-code-translation-client:1.0.3
             ghcr.io/louis030195/codex-code-translation-client:latest
-            ghcr.io/louis030195/codex-code-translation-client:1.0.2
+            ghcr.io/louis030195/codex-code-translation-client:1.0.3

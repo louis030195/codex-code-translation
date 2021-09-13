@@ -39,6 +39,7 @@ defaultTranslation.setOutputLanguage(languages[1]);
 
 function App() {
   const [translation, setTranslation] = useState<Translation>(defaultTranslation);
+  const [isDisabled, setIsDisabled] = useState(false);
   const codeEditorRef = React.useRef<CodeEditorRef>(null);
   useEffect(() => {
     codeEditorRef.current?.setText(translation.getInputCode());
@@ -131,10 +132,16 @@ function App() {
         <button 
           tabIndex={-1}
           className="code-button"
+          disabled={isDisabled}
           onClick={(e) => {
+            if (isDisabled) return;
             createTranslation(e).then((res) => {
               setTranslation(translation.cloneMessage().setOutputCode(res!.getOutputCode()));
             });
+            setIsDisabled(true);
+            setTimeout(() => {
+              setIsDisabled(false);
+            }, 2000);
           }}>Translate
         </button>
       </form>
