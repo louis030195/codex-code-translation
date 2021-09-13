@@ -1,13 +1,6 @@
 use codex_code_translation_server::run;
-use structopt::StructOpt;
 use tracing::error;
 use tracing_subscriber::EnvFilter;
-
-#[derive(StructOpt)]
-struct Opts {
-    #[structopt(name = "use_tls", long)]
-    use_tls: bool,
-}
 
 #[tokio::main]
 async fn main() {
@@ -15,9 +8,7 @@ async fn main() {
         .with_env_filter(EnvFilter::new("tonic_web=trace,server=trace"))
         .init();
 
-    let matches = Opts::from_args();
-
-    if let Err(e) = run(matches.use_tls).await {
+    if let Err(e) = run().await {
         error!("{:?}", e)
     }
 }
