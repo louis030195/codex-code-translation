@@ -1,6 +1,6 @@
 [package]
 name = "codex-code-translation"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Louis Beaumont <louis.beaumont@gmail.com>"]
 edition = "2018"
 

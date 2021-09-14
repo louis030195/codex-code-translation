@@ -1,9 +1,12 @@
-name: Build Docker images & push to Docker Hub
+name: Build Docker images, push to Docker Hub & deploy to Google Cloud Run
 
 on:
   push:
     tags:
       - "v*.*.*"
+
+env:
+  version: '1.0.5'
 
 jobs:
   docker:
@@ -41,9 +44,9 @@ jobs:
           push: true
           tags: |
             louis030195/codex-code-translation-server:latest
-            louis030195/codex-code-translation-server:1.0.4
+            louis030195/codex-code-translation-server:${{ env.version }}
             ghcr.io/louis030195/codex-code-translation-server:latest
-            ghcr.io/louis030195/codex-code-translation-server:1.0.4
+            ghcr.io/louis030195/codex-code-translation-server:${{ env.version }}
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -54,6 +57,26 @@ jobs:
           push: true
           tags: |
             louis030195/codex-code-translation-client:latest
-            louis030195/codex-code-translation-client:1.0.4
+            louis030195/codex-code-translation-client:${{ env.version }}
             ghcr.io/louis030195/codex-code-translation-client:latest
-            ghcr.io/louis030195/codex-code-translation-client:1.0.4
+            ghcr.io/louis030195/codex-code-translation-client:${{ env.version }}
+      - 
+        name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@main
+        with:
+          service: codex-code-translation
+          region: europe-west3          
+          image: gcr.io/louis030195/codex-code-translation-server
+          credentials: ${{ secrets.GCP_SA_KEY }}
+          flags: "--max-instances=1 --use-http2 --port=9999 --platform=managed --allow-unauthenticated"
+          env_vars: OPENAI_KEY=${{ secrets.OPENAI_KEY }},OPENAI_ORG=${{ secrets.OPENAI_ORG }}
+          tag: ${{ env.version }}
+      - 
+        name: Echo URL
+        run: echo "${{ steps.deploy.outputs.url }}"
+      - 
+        name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_REPOSITORY: louis030195/codex-code-translation
