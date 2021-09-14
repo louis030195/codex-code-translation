@@ -146,7 +146,7 @@ dependencies = [
 
 [[package]]
 name = "codex-code-translation-server"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "futures-util",
  "prost",

@@ -65,7 +65,7 @@ jobs:
       - 
         name: Turn svc into base64
         run: |
-          echo "GCP_SA_KEY_AS_BASE64=$(echo ${{ secrets.GCP_SA_KEY }} | python -m base64)" >> $GITHUB_ENV
+          echo "GCP_SA_KEY_AS_BASE64=$(echo '${{ secrets.GCP_SA_KEY }}' | python -m base64)" >> $GITHUB_ENV
       - 
         uses: RafikFarhad/push-to-gcr-github-action@v4
         with:
