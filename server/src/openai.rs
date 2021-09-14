@@ -40,6 +40,7 @@ pub async fn complete(prompt: String) -> Result<String, reqwest::Error> {
     let k = env::var("OPENAI_KEY").unwrap();
     let o = env::var("OPENAI_ORG").unwrap();
     let auth = format!("Bearer {}", k);
+    // TODO: stream!!!!
     let response: OpenAIResponse = reqwest::Client::new()
         .post("https://api.openai.com/v1/engines/davinci-codex/completions")
         .header("Content-Type", "application/json")
@@ -47,11 +48,11 @@ pub async fn complete(prompt: String) -> Result<String, reqwest::Error> {
         .header("OpenAI-Organization", o)
         .json(&serde_json::json!({
             "prompt": prompt.trim(),
-            "temperature": 0.61,
-            "max_tokens": 1515,
+            "temperature": 0.7,
+            "max_tokens": 2000,
             "top_p": 1,
-            "frequency_penalty": 0.4,
-            "presence_penalty": 0.4,
+            "frequency_penalty": 0.3,
+            "presence_penalty": 0.3,
             "stop": ["###", "\n###\n", "\"\"\""]
           }))
         .send()
@@ -94,6 +95,65 @@ func add(a, b int) int {
 C:
 int add(int a, int b) {
     return a + b;
+}
+
+###
+
+Python:
+def main():
+    number = 3
+    if number < 5:
+        print(\"condition was true\")
+    else:
+        print(\"condition was false\")
+
+###
+
+Rust:
+fn main() {
+  let number = 3;
+
+  if number < 5 {
+      println!(\"condition was true\");
+  } else {
+      println!(\"condition was false\");
+  }
+}
+
+C:
+int main() {
+    int number = 3;
+    if (number < 5) {
+        printf(\"condition was true\");
+    } else {
+        printf(\"condition was false\");
+    }
+}
+
+###
+
+Go:
+func main() {
+    var number int = 3
+    if number < 5 {
+        fmt.Println(\"condition was true\")
+    } else {
+        fmt.Println(\"condition was false\")
+    }
+}
+
+###
+
+Java:
+public class Main {
+    public static void main(String[] args) {
+        int number = 3;
+        if (number < 5) {
+            System.out.println(\"condition was true\");
+        } else {
+            System.out.println(\"condition was false\");
+        }
+    }
 }
 
 ###

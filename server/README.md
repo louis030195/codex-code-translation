@@ -18,8 +18,9 @@ GCP_PROJECT="my project"
 
 # Boring stuff because gcp run can't pull from dockerhub
 GOOGLE_REGISTRY_TAG=gcr.io/${GCP_PROJECT}/louis030195/codex-code-translation-server:1.0.0
-docker pull louis030195/codex-code-translation-server:1.0.0
-docker tag louis030195/codex-code-translation-server:1.0.0 ${GOOGLE_REGISTRY_TAG}
+DOCKERHUB_REGISTRY_TAG=louis030195/codex-code-translation-server:1.0.0
+docker pull ${DOCKERHUB_REGISTRY_TAG}
+docker tag ${DOCKERHUB_REGISTRY_TAG} ${GOOGLE_REGISTRY_TAG}
 docker push ${GOOGLE_REGISTRY_TAG}
 
 gcloud run deploy codex-code-translation \
