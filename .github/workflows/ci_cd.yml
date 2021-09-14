@@ -62,9 +62,14 @@ jobs:
             ghcr.io/louis030195/codex-code-translation-client:latest
             ghcr.io/louis030195/codex-code-translation-client:${{ steps.get_tag_name.outputs.GIT_TAG_NAME}}
       - uses: google-github-actions/setup-gcloud@master
-      - uses: RafikFarhad/push-to-gcr-github-action@v4
+      - 
+        name: Turn svc into base64
+        run: |
+          echo "GCP_SA_KEY_AS_BASE64=$(echo ${{ secrets.GCP_SA_KEY }} | python -m base64)" >> $GITHUB_ENV
+      - 
+        uses: RafikFarhad/push-to-gcr-github-action@v4
         with:
-          gcloud_service_key: ${{ secrets.GCP_SA_KEY }}
+          gcloud_service_key: ${{ env.GCP_SA_KEY_AS_BASE64 }}
           registry: gcr.io
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
           image_name: codex-code-translation
